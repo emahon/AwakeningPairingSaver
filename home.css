@@ -1,0 +1,34 @@
+.male {
+	background-color: lightblue;
+	width: 50%;
+	float: left;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.female {
+	background-color: pink;
+	width: 50%;
+	float: right;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.male-character {
+	background-color: #0099ff;
+	padding: 2px;
+	margin: 5px;
+}
+.female-character {
+	background-color: #ff6699;
+	padding: 2px;
+	margin: 5px;
+}
+.pairing-checker {
+	border: 1px solid black;
+	color: #e6e6e6;
+}
+#pairing-checker-male {
+	float: left;
+}
+#pairing-checker-female {
+	float: right;
+}
