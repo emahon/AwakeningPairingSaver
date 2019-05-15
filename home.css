@@ -22,9 +22,14 @@
 	padding: 2px;
 	margin: 5px;
 }
+.pairing-container {
+	clear:both;
+}
 .pairing-checker {
 	border: 1px solid black;
 	color: #e6e6e6;
+	width: 60px;
+	height: 20px;
 }
 #pairing-checker-male {
 	float: left;

@@ -3,7 +3,7 @@
 <head>
 <link rel="stylesheet" href="home.css" />
 <script src="jquery-3.4.1.js"></script>
-<script src="characters.json"></script>
+<script src="characters.js"></script>
 <script src="home.js"></script>
 </head>
 <body>
@@ -20,15 +20,20 @@ Select your Avatar's Gender
 <option value="female">Female</option>
 </select>
 </div>
+<div>
 <div class="male">
-<select id="male-characters">
-</select>
 </div>
 <div class="female">
-<span class="female-character" id="lissa">Lissa<br /></span>
-<span class="female-character" id="sully">Sully<br /></span>
+</div>
 </div>
 <div class="pairing-container">
+<div id="pairing-checker-male" class="pairing-checker" ondrop="drop(event)" ondragover="dragover(event)">
+</div>
+<div id="pairing-checker-female" class="pairing-checker" ondrop="drop(event)" ondragover="dragover(event)">
+</div>
+<button id="pair-characters-button">Pair</button>
+</div>
+<div class="pairings-list-container">
 </div>
 </body>
 </html>

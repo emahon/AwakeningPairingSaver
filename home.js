@@ -1,17 +1,67 @@
+var avatarGender = "";
+var characters = [];
+
 function avatarGenderSelect_change(e) {
 	var value = ($(this).val());
 	if (value === "male") {
-		$(".male").append('<span class="male-character" id="avatar-m">Avatar<br /></span>');
-		$("#avatar-f").remove();
+		avatarGender = "m";
+		refreshCharacters();
 	}
 	else if (value === "female") {
-		$(".female").append('<span class="female-character" id="avatar-f">Avatar<br /></span>');
-		$("#avatar-m").remove();
+		avatarGender = "f";
+		refreshCharacters();
 	}
 	else {
-		$("#avatar-m").remove();
-		$("#avatar-f").remove();
+		avatarGender = "";
+		refreshCharacters();
 	}		
+}
+
+// https://www.w3schools.com/html/html5_draganddrop.asp
+function drag(ev) {
+	ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+	ev.preventDefault();
+	ev.stopPropagation();
+	var data = ev.dataTransfer.getData("text");
+	ev.target.appendChild(document.getElementById(data));
+}
+
+function dragover(ev) {
+	ev.preventDefault();
+}
+
+function refreshCharacters() {
+	$(".female").empty();
+	$(".male").empty();
+	for(var character of characters) {
+		if (!character.married) {			
+			if ((character.pool === "main-female")
+				|| (character.pool === "sumia")
+				|| (character.pool === "chrom-pool")) {
+				$(".female").append('<span id="' + character.name + '" class="female-character ' +  character.pool +'" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+			}
+			else if ((character.pool === "main-male")
+				|| (character.pool === "chrom") 
+				|| (character.pool === "sumia-pool")){
+				$(".male").append('<span id="' + character.name + '" class="male-character ' + character.pool + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+			}
+			else if ((character.pool === "avatar-f") && (avatarGender === "f")) {
+				$(".female").append('<span id="' + character.name + '" class="female-character avatar-f" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+			}
+			else if ((character.pool === "avatar-f-pool") && (avatarGender === "f")) {
+				$(".male").append('<span id="' + character.name + '" class="male-character avatar-f-pool" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+			}
+			else if ((character.pool === "avatar-m") && (avatarGender === "m")) {
+				$(".male").append('<span id="' + character.name + '" class="male-character avatar-m" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+			}
+			else if ((character.pool === "avatar-m-pool") && (avatarGender === "m")) {
+				$(".female").append('<span id="' + character.name + '" class="female-character avatar-f" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+			}
+		}		
+	}
 }
 
 $(document).ready(function() {
@@ -19,8 +69,10 @@ $(document).ready(function() {
 	$("#avatar-gender-select").on('change',avatarGenderSelect_change);
 	
 	//load data
-	var characters = JSON.parse();
+	
+	characters = charactersOriginal;
 	
 	var saveFiles = JSON.parse(localStorage.getItem("saveFiles"));
 	
+	refreshCharacters();
 });
