@@ -22,11 +22,48 @@ function drag(ev) {
 	ev.dataTransfer.setData("text", ev.target.id);
 }
 
-function drop(ev) {
+// https://stackoverflow.com/questions/28203585/prevent-drop-inside-a-child-element-when-drag-dropping-with-js
+
+function dropFemaleContainer(ev, el) {
 	ev.preventDefault();
 	ev.stopPropagation();
 	var data = ev.dataTransfer.getData("text");
-	ev.target.appendChild(document.getElementById(data));
+	var el = document.getElementById(data);
+	if (el.classList.contains("female-character")) {
+		ev.target.appendChild(document.getElementById(data));
+	}
+}
+
+function dropFemalePair(ev, el) {
+	ev.preventDefault();
+	ev.stopPropagation();
+	var data = ev.dataTransfer.getData("text");
+	var el = document.getElementById(data);
+	if (el.classList.contains("female-character")
+		&& (ev.target.children.length === 0)) {
+		ev.target.appendChild(document.getElementById(data));
+	}
+}
+
+function dropMaleContainer(ev, el) {
+	ev.preventDefault();
+	ev.stopPropagation();
+	var data = ev.dataTransfer.getData("text");
+	var el = document.getElementById(data);
+	if (el.classList.contains("male-character")) {
+		ev.target.appendChild(document.getElementById(data));
+	}
+}
+
+function dropMalePair(ev, el) {
+	ev.preventDefault();
+	ev.stopPropagation();
+	var data = ev.dataTransfer.getData("text");
+	var el = document.getElementById(data);
+	if (el.classList.contains("male-character")
+		&& (ev.target.children.length === 0)) {
+		ev.target.appendChild(document.getElementById(data));
+	}
 }
 
 function dragover(ev) {

@@ -21,15 +21,15 @@ Select your Avatar's Gender
 </select>
 </div>
 <div>
-<div class="male">
+<div class="male" ondrop="dropMaleContainer(event, this)" ondragover="dragover(event)">
 </div>
-<div class="female">
+<div class="female" ondrop="dropFemaleContainer(event, this)" ondragover="dragover(event)">
 </div>
 </div>
 <div class="pairing-container">
-<div id="pairing-checker-male" class="pairing-checker" ondrop="drop(event)" ondragover="dragover(event)">
+<div id="pairing-checker-male" class="pairing-checker" ondrop="dropMalePair(event, this)" ondragover="dragover(event)">
 </div>
-<div id="pairing-checker-female" class="pairing-checker" ondrop="drop(event)" ondragover="dragover(event)">
+<div id="pairing-checker-female" class="pairing-checker" ondrop="dropFemalePair(event, this)" ondragover="dragover(event)">
 </div>
 <button id="pair-characters-button">Pair</button>
 </div>
