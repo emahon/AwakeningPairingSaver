@@ -88,29 +88,47 @@ function refreshCharacters() {
 	$(".female").empty();
 	$(".male").empty();
 	var canMarry = [];
+	var malePools = ["avatar-m", "chrom", "sumia-pool", "main-male", "avatar-f-pool", "morgan-m", "child-male"];
+	var femalePools = ["avatar-f", "sumia", "chrom-pool", "main-female", "avatar-m-pool", "morgan-f", "child-female"];
 	if (activeFemaleCharacter !== "") {
 		var pairedCharacter = characters.find(function(e) { return e.name === activeFemaleCharacter; }); 
 		canMarry = pairedCharacter.canMarry;
+	}
+	else {
+		canMarry = malePools;
 	}
 	if (activeMaleCharacter !== "") {
 		var pairedCharacter = characters.find(function(e) { return e.name === activeMaleCharacter; });
 		canMarry = canMarry.concat(pairedCharacter.canMarry);
 	}
+	else {
+		canMarry = canMarry.concat(femalePools);
+	}
 	
-	for(var character of characters) {		
+	for(var character of characters) {
+		var born = true;
+		
+		if (character.parent) {
+			var characterParent = characters.find(function(c) { return c.name === character.parent; });
+			born = characterParent.married;
+		}
+		
 		if (!character.married 
+			&& born
 			&& (character.name !== activeFemaleCharacter)
 			&& (character.name !== activeMaleCharacter)
 			&& ((canMarry.length === 0) || canMarry.includes(character.pool))) {
 				
 			if ((character.pool === "main-female")
 				|| (character.pool === "sumia")
-				|| (character.pool === "chrom-pool")) {
+				|| (character.pool === "chrom-pool")
+				|| (character.pool === "child-female")) {
 				$(".female").append('<span id="' + character.name + '" class="female-character ' +  character.pool + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
 			}
 			else if ((character.pool === "main-male")
 				|| (character.pool === "chrom") 
-				|| (character.pool === "sumia-pool")){
+				|| (character.pool === "sumia-pool")
+				|| (character.pool === "child-male")){
 				$(".male").append('<span id="' + character.name + '" class="male-character ' + character.pool + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
 			}
 			else if ((character.pool === "avatar-f") && (avatarGender === "f")) {
@@ -125,13 +143,36 @@ function refreshCharacters() {
 			else if ((character.pool === "avatar-m-pool") && (avatarGender === "m")) {
 				$(".female").append('<span id="' + character.name + '" class="female-character avatar-f' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
 			}
+			else if ((character.pool === "morgan-f") && (avatarGender === "m")) {
+				$(".female").append('<span id="' + character.name + '" class="female-character morgan-f"' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />'); 
+			}
+			else if ((character.pool === "morgan-m") && (avatarGender === "f")) {
+				$(".male").append('<span id="' + character.name + '" class="male-character morgan-m"' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+			}
 		}		
 	}
+}
+
+function pairCharactersButton_click(e) {
+	var maleCharacter = characters.find(function(e) { return e.name === activeMaleCharacter; });
+	var femaleCharacter = characters.find(function(e) { return e.name === activeFemaleCharacter; });
+	
+	maleCharacter.married = true;
+	femaleCharacter.married = true;
+	
+	$(".pairings-list-container").append('<span>' + activeMaleCharacter + ' and ' + activeFemaleCharacter + '</span><br />');
+	$("#pairing-checker-male").empty();
+	$("#pairing-checker-female").empty();
+	
+	activeMaleCharacter = "";
+	activeFemaleCharacter = "";
+	refreshCharacters();
 }
 
 $(document).ready(function() {
 	// initialize selector functions	
 	$("#avatar-gender-select").on('change',avatarGenderSelect_change);
+	$("#pair-characters-button").click(pairCharactersButton_click);
 	
 	//load data
 	
