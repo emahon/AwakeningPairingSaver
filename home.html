@@ -12,13 +12,19 @@
 Fire Emblem Awakening Marriage Planner
 </h4>
 </div>
-<div class="avatar-gender">
+<div class="save-config">
+Load an existing save file
+<select id="save-file-select">
+<option value=""></option>
+</select><br />
 Select your Avatar's Gender
 <select id="avatar-gender-select">
 <option value=""></option>
 <option value="male">Male</option>
 <option value="female">Female</option>
-</select>
+</select><br />
+Name your avatar / save file
+<input id="save-file-name" type="text"></input>
 </div>
 <div>
 <div class="male" ondrop="dropMaleContainer(event, this)" ondragover="dragover(event)">
@@ -32,6 +38,7 @@ Select your Avatar's Gender
 <div id="pairing-checker-female" class="pairing-checker" ondrop="dropFemalePair(event, this)" ondragover="dragover(event)">
 </div>
 <button id="pair-characters-button">Pair</button>
+<button id="save-pairings-button">Save</button>
 </div>
 <div class="pairings-list-container">
 </div>

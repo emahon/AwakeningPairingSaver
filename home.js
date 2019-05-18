@@ -3,6 +3,7 @@ var activeMaleCharacter = "";
 var activeFemaleCharacter = "";
 var characters = [];
 var marriages = [];
+var saveFiles = [];
 
 function avatarGenderSelect_change(e) {
 	var value = ($(this).val());
@@ -214,16 +215,60 @@ function removeMarriageButton_click(e) {
 	refreshCharacters();
 }
 
+function savePairingsButton_click(e) {
+	var saveFileName = $("#save-file-name").val();
+	var saveObj = {
+		avatarGender: avatarGender,
+		characters: characters,
+		marriages: marriages
+	};
+	var saveString = JSON.stringify(saveObj);
+	localStorage.setItem(saveFileName, saveString);
+	
+	console.log("Save files: " + saveFiles);
+	console.log("Name: " + saveFileName);
+	
+	if (!saveFiles.includes(saveFileName)) {
+		saveFiles.push(saveFileName);
+		localStorage.setItem("saveFiles", JSON.stringify(saveFiles));
+	}
+}
+
+function saveFileSelect_change(e) {
+	var saveFileName = $("#save-file-select").val();
+	
+	console.log(saveFileName);
+	
+	var saveFile = JSON.parse(localStorage.getItem(saveFileName));
+	
+	avatarGender = saveFile.avatarGender;
+	characters = saveFile.characters;
+	marriages = saveFile.marriages;
+	
+	refreshMarriages();
+	refreshCharacters();
+}
+
 $(document).ready(function() {
 	// initialize selector functions	
-	$("#avatar-gender-select").on('change',avatarGenderSelect_change);
+	$("#avatar-gender-select").on('change', avatarGenderSelect_change);
 	$("#pair-characters-button").click(pairCharactersButton_click);
+	$("#save-pairings-button").click(savePairingsButton_click);
+	$("#save-file-select").on('change', saveFileSelect_change);
 	
 	//load data
 	
 	characters = charactersOriginal;
 	
-	var saveFiles = JSON.parse(localStorage.getItem("saveFiles"));
+	var saveFilesSaved = JSON.parse(localStorage.getItem("saveFiles"));
 	
+	if (saveFilesSaved !== null) {
+		saveFiles = saveFilesSaved;
+	}
+	
+	for(var saveFile of saveFiles) {
+		$("#save-file-select").append('<option value="' + saveFile + '">' + saveFile + "</option>");
+	}
+		
 	refreshCharacters();
 });
