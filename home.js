@@ -2,6 +2,7 @@ var avatarGender = "";
 var activeMaleCharacter = "";
 var activeFemaleCharacter = "";
 var characters = [];
+var marriages = [];
 
 function avatarGenderSelect_change(e) {
 	var value = ($(this).val());
@@ -153,6 +154,14 @@ function refreshCharacters() {
 	}
 }
 
+function refreshMarriages() {
+	$(".pairings-list-container").empty();
+	for (var marriage of marriages) {
+		$(".pairings-list-container").append('<span>' + marriage.male + ' and ' + marriage.female + '<button class="remove-marriage-button" id="marriage-' + marriage.male + '">x</button></span><br />');	
+	}
+	$(".remove-marriage-button").click(removeMarriageButton_click);
+}
+
 function pairCharactersButton_click(e) {
 	var maleCharacter = characters.find(function(e) { return e.name === activeMaleCharacter; });
 	var femaleCharacter = characters.find(function(e) { return e.name === activeFemaleCharacter; });
@@ -160,12 +169,48 @@ function pairCharactersButton_click(e) {
 	maleCharacter.married = true;
 	femaleCharacter.married = true;
 	
-	$(".pairings-list-container").append('<span>' + activeMaleCharacter + ' and ' + activeFemaleCharacter + '</span><br />');
+	marriages.push( {
+		male: maleCharacter.name,
+		female: femaleCharacter.name
+	});
+	
 	$("#pairing-checker-male").empty();
 	$("#pairing-checker-female").empty();
 	
 	activeMaleCharacter = "";
 	activeFemaleCharacter = "";
+	refreshMarriages();
+	refreshCharacters();
+}
+
+function removeMarriageButton_click(e) {
+	var marriedMale = e.target.id.split("-")[1];
+	var marriage = marriages.find(function(m) { return m.male === marriedMale; });
+	var maleCharacter = characters.find(function(c) { return c.name === marriage.male; } );
+	var femaleCharacter = characters.find(function(c) { return c.name === marriage.female; } );
+	
+	maleCharacter.married = false;
+	femaleCharacter.married = false;
+	
+	// remove children, including from marriages
+	var children = characters.filter(function(c) { return (c.parent === maleCharacter.name) || (c.parent === femaleCharacter.name); });
+	
+	if (children.length > 0) {
+		var childNames = children.map(function(c) { return c.name; } );
+		var childMarriages = marriages.filter(function(m) { return (childNames.includes(m.male) || childNames.includes(m.female)); });
+		for (var childMarriage of childMarriages) {
+			var maleChild = characters.find(function(c) { return c.name === childMarriage.male; } );
+			var femaleChild = characters.find(function(c) { return c.name === childMarriage.female; });
+			
+			maleChild.married = false;
+			femaleChild.married = false;
+		}
+		marriages = marriages.filter(function(m) { return (!childNames.includes(m.male) && !childNames.includes(m.female)); });
+	}
+	
+	// remove deleted marriage
+	marriages = marriages.filter(function(m) { return m !== marriage });
+	refreshMarriages();
 	refreshCharacters();
 }
 
