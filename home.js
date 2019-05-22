@@ -7,16 +7,24 @@ var saveFiles = [];
 
 function avatarGenderSelect_change(e) {
 	var value = ($(this).val());
+	var maleAvatar = characters.find(function(c) { return c.name === "Avatar-m"; });
+	var femaleAvatar = characters.find(function(c) { return c.name === "Avatar-f"; });
 	if (value === "male") {
 		avatarGender = "m";
+		maleAvatar.exists = true;
+		femaleAvatar.exists = false;
 		refreshCharacters();
 	}
 	else if (value === "female") {
 		avatarGender = "f";
+		maleAvatar.exists = false;
+		femaleAvatar.exists = true;
 		refreshCharacters();
 	}
 	else {
 		avatarGender = "";
+		maleAvatar.exists = false;
+		femaleAvatar.exists = false;
 		refreshCharacters();
 	}		
 }
@@ -99,6 +107,7 @@ function refreshCharacters() {
 	else {
 		canMarry = malePools;
 	}
+	
 	if (activeMaleCharacter !== "") {
 		var pairedCharacter = characters.find(function(e) { return e.name === activeMaleCharacter; });
 		canMarry = canMarry.concat(pairedCharacter.canMarry);
@@ -107,49 +116,47 @@ function refreshCharacters() {
 		canMarry = canMarry.concat(femalePools);
 	}
 	
-	for(var character of characters) {
-		var born = true;
-		
-		if (character.parent) {
-			var characterParent = characters.find(function(c) { return c.name === character.parent; });
-			born = characterParent.married;
-		}
-		
+	for (var character of characters) {		
 		if (!character.married 
-			&& born
+			&& character.exists
 			&& (character.name !== activeFemaleCharacter)
 			&& (character.name !== activeMaleCharacter)
 			&& ((canMarry.length === 0) || canMarry.includes(character.pool))) {
 				
-			if ((character.pool === "main-female")
+			// check for empty pool for character
+			var marriagable = characters.filter(function(c) { return (!c.married && c.exists & character.canMarry.includes(c.pool)); });
+			
+			if (marriagable.length > 0) {
+				if ((character.pool === "main-female")
 				|| (character.pool === "sumia")
 				|| (character.pool === "chrom-pool")
 				|| (character.pool === "child-female")) {
 				$(".female").append('<span id="' + character.name + '" class="female-character ' +  character.pool + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
-			}
-			else if ((character.pool === "main-male")
-				|| (character.pool === "chrom") 
-				|| (character.pool === "sumia-pool")
-				|| (character.pool === "child-male")){
-				$(".male").append('<span id="' + character.name + '" class="male-character ' + character.pool + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
-			}
-			else if ((character.pool === "avatar-f") && (avatarGender === "f")) {
-				$(".female").append('<span id="' + character.name + '" class="female-character avatar-f' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
-			}
-			else if ((character.pool === "avatar-f-pool") && (avatarGender === "f")) {
-				$(".male").append('<span id="' + character.name + '" class="male-character avatar-f-pool' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
-			}
-			else if ((character.pool === "avatar-m") && (avatarGender === "m")) {
-				$(".male").append('<span id="' + character.name + '" class="male-character avatar-m' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
-			}
-			else if ((character.pool === "avatar-m-pool") && (avatarGender === "m")) {
-				$(".female").append('<span id="' + character.name + '" class="female-character avatar-f' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
-			}
-			else if ((character.pool === "morgan-f") && (avatarGender === "m")) {
-				$(".female").append('<span id="' + character.name + '" class="female-character morgan-f"' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />'); 
-			}
-			else if ((character.pool === "morgan-m") && (avatarGender === "f")) {
-				$(".male").append('<span id="' + character.name + '" class="male-character morgan-m"' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+				}
+				else if ((character.pool === "main-male")
+					|| (character.pool === "chrom") 
+					|| (character.pool === "sumia-pool")
+					|| (character.pool === "child-male")){
+					$(".male").append('<span id="' + character.name + '" class="male-character ' + character.pool + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+				}
+				else if ((character.pool === "avatar-f") && (avatarGender === "f")) {
+					$(".female").append('<span id="' + character.name + '" class="female-character avatar-f' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+				}
+				else if ((character.pool === "avatar-f-pool") && (avatarGender === "f")) {
+					$(".male").append('<span id="' + character.name + '" class="male-character avatar-f-pool' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+				}
+				else if ((character.pool === "avatar-m") && (avatarGender === "m")) {
+					$(".male").append('<span id="' + character.name + '" class="male-character avatar-m' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+				}
+				else if ((character.pool === "avatar-m-pool") && (avatarGender === "m")) {
+					$(".female").append('<span id="' + character.name + '" class="female-character avatar-f' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+				}
+				else if ((character.pool === "morgan-f") && (avatarGender === "m")) {
+					$(".female").append('<span id="' + character.name + '" class="female-character morgan-f"' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />'); 
+				}
+				else if ((character.pool === "morgan-m") && (avatarGender === "f")) {
+					$(".male").append('<span id="' + character.name + '" class="male-character morgan-m"' + '" draggable="true" ondragstart="drag(event)">' + character.name + '</span><br />');
+				}
 			}
 		}		
 	}
@@ -175,6 +182,19 @@ function pairCharactersButton_click(e) {
 		female: femaleCharacter.name
 	});
 	
+	// check for kids
+	
+	var motherKid = characters.find(function(c) { return c.parent === femaleCharacter.name; });
+	var fatherKid = characters.find(function(c) { return c.parent === maleCharacter.name; });
+	
+	if (motherKid) {
+		motherKid.exists = true;
+	}
+	
+	if (fatherKid) {
+		fatherKid.exists = true;
+	}
+	
 	$("#pairing-checker-male").empty();
 	$("#pairing-checker-female").empty();
 	
@@ -195,6 +215,10 @@ function removeMarriageButton_click(e) {
 	
 	// remove children, including from marriages
 	var children = characters.filter(function(c) { return (c.parent === maleCharacter.name) || (c.parent === femaleCharacter.name); });
+	
+	for (var child of children) {
+		child.exists = false;
+	}
 	
 	if (children.length > 0) {
 		var childNames = children.map(function(c) { return c.name; } );
