@@ -94,15 +94,36 @@ function dragover(ev) {
 	ev.preventDefault();
 }
 
+function findSibling(character) {
+	var parentMarriage = marriages.find(function(m) { return (m.male === character.parent) || (m.female === character.parent); });
+	
+	if (parentMarriage) {
+		var sibling = characters.find(function(c) { return ((c.parent === parentMarriage.male) || (c.parent === parentMarriage.female)) && (c !== character); });
+		return sibling;
+	}
+	
+	return "";
+}
+
 function refreshCharacters() {
 	$(".female").empty();
 	$(".male").empty();
 	var canMarry = [];
 	var malePools = ["avatar-m", "chrom", "sumia-pool", "main-male", "avatar-f-pool", "morgan-m", "child-male"];
 	var femalePools = ["avatar-f", "sumia", "chrom-pool", "main-female", "avatar-m-pool", "morgan-f", "child-female"];
+	
+	var sibling = "";
+	
 	if (activeFemaleCharacter !== "") {
 		var pairedCharacter = characters.find(function(e) { return e.name === activeFemaleCharacter; }); 
 		canMarry = pairedCharacter.canMarry;
+						
+		if (pairedCharacter.parent) {
+			var siblingObj = findSibling(pairedCharacter);
+			if (malePools.includes(siblingObj.pool)) {
+				sibling = siblingObj.name;
+			}
+		}
 	}
 	else {
 		canMarry = malePools;
@@ -111,6 +132,12 @@ function refreshCharacters() {
 	if (activeMaleCharacter !== "") {
 		var pairedCharacter = characters.find(function(e) { return e.name === activeMaleCharacter; });
 		canMarry = canMarry.concat(pairedCharacter.canMarry);
+		if (pairedCharacter.parent) {
+			var siblingObj = findSibling(pairedCharacter);
+			if (femalePools.includes(siblingObj.pool)) {
+				sibling = siblingObj.name;
+			}
+		}
 	}
 	else {
 		canMarry = canMarry.concat(femalePools);
@@ -119,13 +146,22 @@ function refreshCharacters() {
 	for (var character of characters) {		
 		if (!character.married 
 			&& character.exists
+			&& character.name !== sibling
 			&& (character.name !== activeFemaleCharacter)
 			&& (character.name !== activeMaleCharacter)
 			&& ((canMarry.length === 0) || canMarry.includes(character.pool))) {
+			
+			var sibling2 = "";
+			
+			if (character.parent) {
+				var siblingObj2 = findSibling(character);
+			
+				sibling2 = siblingObj2 ? siblingObj2.name : "";
+			}			
 				
 			// check for empty pool for character
-			var marriagable = characters.filter(function(c) { return (!c.married && c.exists & character.canMarry.includes(c.pool)); });
-			
+			var marriagable = characters.filter(function(c) { return (!c.married && c.exists && character.canMarry.includes(c.pool) && (c.name !== sibling2)); });
+						
 			if (marriagable.length > 0) {
 				if ((character.pool === "main-female")
 				|| (character.pool === "sumia")
@@ -261,11 +297,9 @@ function savePairingsButton_click(e) {
 function saveFileSelect_change(e) {
 	var saveFileName = $("#save-file-select").val();
 	
-	console.log(saveFileName);
-	
 	var saveFile = JSON.parse(localStorage.getItem(saveFileName));
 	
-	avatarGender = saveFile.avatarGender;
+	avatarGender = saveFile.avatarGender;	
 	characters = saveFile.characters;
 	marriages = saveFile.marriages;
 	

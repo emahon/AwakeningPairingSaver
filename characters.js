@@ -193,6 +193,7 @@ var charactersOriginal = [
 		married : false,
 		pool : "child-female",
 		canMarry : ["avatar-m", "morgan-m", "child-male"],
+		parent: "Chrom",
 		exists: true
 	},
 	{
